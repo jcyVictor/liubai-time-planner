@@ -24,7 +24,7 @@
 
 1. 登录 GitHub，新建一个仓库，例如 `time-planner`。免费账号建议选择 Public（公开仓库仅包含网页代码，你在网页里输入的计划不会提交到仓库）。
 2. 解压项目，把以下文件和 `icons` 文件夹上传到仓库根目录：
-   `index.html`、`style.css`、`app.js`、`core.js`、`timer.js`、`focus.js`、`records.js`、`manifest.webmanifest`、`sw.js`、`icons/`。
+   `index.html`、`style.css`、`app.js`、`core.js`、`timer.js`、`focus.js`、`records.js`、`migrate-data.js`、`migration.js`、`manifest.webmanifest`、`sw.js`、`icons/`。
 3. 打开仓库 **Settings → Pages**。
 4. 在 **Build and deployment** 下选择 **Deploy from a branch**，Branch 选 **main**，目录选 **/(root)**，点击 Save。
 5. 等待 Pages 部署完成，打开页面中显示的正式地址，通常为 `https://你的用户名.github.io/time-planner/`。
@@ -59,3 +59,15 @@ npm test
 ```
 
 测试覆盖空档合并与裁切、星期重复与指定日期、冲突检测、备份校验和日期边界。已用 Chromium 验证手机 / 桌面布局、作息设置、任务安排与完成、刷新保存和离线重新打开。手机系统实际安装需在真实设备上完成。
+
+## 从旧 Sites 网址迁移到 GitHub Pages
+
+在原来能看到任务的浏览器或桌面应用中打开 https://liubai-time-planner.lilacmars128.chatgpt.site/ ，刷新后点击“迁移到 GitHub 版”。新页面会显示收到的任务、固定安排和执行记录数量，点击“确认迁入”即可。
+
+- 会保留新网站原有内容；相同 ID 的任务以新网站版本为准，重复迁移不会重复添加。
+- 默认保留新网站已设置的作息；可以在确认界面选择使用旧网站作息。
+- 保存前会在新网站本地保留迁移前备份，旧网站数据不会被清除。
+- 正在计时的任务请先结束并保存，再迁移。
+- 小型备份通过浏览器 URL 片段临时带到新网站，不发送给托管服务器；迁移链接含数据，请勿转发，新网站读取后立即清除片段。
+- 数据较多时会提供 JSON 文件迁移，在新网站顶部选择“已有旧版备份？导入并合并”。
+- 这是一次迁移，不会自动跨站同步。需要在持有旧数据的浏览器或桌面应用里操作。

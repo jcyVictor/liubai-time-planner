@@ -26,7 +26,7 @@ jobs:
       - name: Prepare website
         run: |
           mkdir dist
-          cp index.html style.css app.js core.js records.js timer.js focus.js manifest.webmanifest sw.js dist/
+          cp index.html style.css app.js core.js records.js migrate-data.js migration.js timer.js focus.js manifest.webmanifest sw.js dist/
           cp -R icons dist/
           touch dist/.nojekyll
       - uses: actions/upload-pages-artifact@v3

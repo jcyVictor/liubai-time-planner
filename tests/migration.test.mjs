@@ -1,0 +1,10 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {emptyState,validState} from '../core.js';
+import {cleanPlanner,encodeTransfer,decodeTransfer,mergePlanners} from '../migrate-data.js';
+const task=(id,title='背单词 📚')=>({id,title,duration:30,date:null,start:null,done:true});
+const old=()=>({...emptyState(),configured:true,wake:480,tasks:[task('old')],sessions:[{id:'r',taskId:'old',title:'背单词 📚',startedAt:1000,endedAt:61000,activeMs:60000,reason:'manual'}]});
+test('中文、emoji、已完成状态及执行记录可完整往返',()=>{assert.deepEqual(decodeTransfer(encodeTransfer(old())),cleanPlanner(old()));});
+test('迁入空白网站时复制旧作息，现有内容与新作息保留',()=>{const blank=mergePlanners(emptyState(),old());assert.equal(blank.state.wake,480);assert.equal(blank.state.sessions.length,1);const target={...emptyState(),configured:true,tasks:[task('new','新任务')]};const merged=mergePlanners(target,old());assert.equal(merged.state.wake,420);assert.equal(merged.state.tasks.length,2);assert.equal(mergePlanners(target,old(),true).state.wake,480);});
+test('相同任务保留新版修改，重复迁入不产生重复任务和记录',()=>{const first=mergePlanners(emptyState(),old()).state;first.tasks[0].title='新版修改';const second=mergePlanners(first,old());assert.deepEqual(second.added,{tasks:0,blocks:0,sessions:0});assert.equal(second.state.tasks[0].title,'新版修改');});
+test('任务和固定安排 id 冲突时保留双方并重映射执行记录',()=>{const target={...emptyState(),blocks:[{id:'old',title:'工作',start:540,end:600,days:[1]}]};const merged=mergePlanners(target,old()).state;assert.notEqual(merged.tasks[0].id,'old');assert.equal(merged.sessions[0].taskId,merged.tasks[0].id);assert.equal(validState(merged),true);assert.deepEqual(mergePlanners(merged,old()).added,{tasks:0,blocks:0,sessions:0});});
+test('拒绝损坏输入，兼容没有 sessions 的旧备份，不传输无关字段',()=>{assert.throws(()=>decodeTransfer('%%%'));assert.throws(()=>cleanPlanner({version:1,tasks:[null]}));const value=old();delete value.sessions;value.extra='not transferred';assert.equal(cleanPlanner(value).sessions.length,0);assert.equal(cleanPlanner(value).extra,undefined);});

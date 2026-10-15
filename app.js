@@ -1,4 +1,5 @@
 import {minutes,clock,dateKey,dayAt,entriesFor,freeSlots,canSchedule,emptyState,validState} from './core.js';
+import {setupMigration} from './migration.js';
 import {createFocus} from './focus.js';
 import {sessionEntries,applySession,timeLabel,elapsedLabel} from './records.js';
 const $=s=>document.querySelector(s), KEY='liubai-planner-v1';
@@ -107,3 +108,5 @@ window.addEventListener('storage',e=>{if(e.key===KEY&&e.newValue){try{const s=JS
 if('serviceWorker' in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('./sw.js').catch(()=>toast('离线功能暂时不可用，联网时仍可使用。'));
 focus=createFocus({getTask:id=>state.tasks.find(t=>t.id===id),recordExecution,onChange:focusChanged,toast});
 render();if(storageWarning)setTimeout(()=>toast('读取本地计划失败，请勿清理浏览器，可尝试导入备份。'),500);
+
+setupMigration({getState:()=>state,getTimer:()=>focus?.current(),acceptState:next=>{state=next;storageWarning=false;render();}});
